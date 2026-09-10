@@ -1,0 +1,18 @@
+{
+  "name": "oneureodi",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build:shared": "npm run build -w @oneureodi/shared",
+    "dev:server": "npm run build:shared && npm run start:dev -w @oneureodi/server",
+    "dev:mobile": "npm run build:shared && npm run start -w mobile",
+    "typecheck": "npm run build:shared && npm run typecheck -w @oneureodi/server && npm run typecheck -w mobile",
+    "test": "npm run build:shared && npm test -w @oneureodi/server",
+    "build": "npm run build:shared && npm run build -w @oneureodi/server",
+    "db:migrate": "npm run prisma:migrate -w @oneureodi/server",
+    "db:generate": "npm run prisma:generate -w @oneureodi/server"
+  }
+}

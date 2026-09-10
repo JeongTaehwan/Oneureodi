@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// 지도 API(카카오)에서 가져온 장소. (provider, providerPlaceId) 가 자연키.
+model Place {
+  id              String   @id @default(uuid())
+  provider        String   // "kakao"
+  providerPlaceId String
+  name            String
+  category        String?
+  categoryGroup   String?  // 카카오 category_group_code (CE7 카페, FD6 음식점, CT1 문화시설, AT4 관광명소)
+  lat             Float
+  lng             Float
+  address         String?
+  roadAddress     String?
+  phone           String?
+  url             String?
+  /// "yes" | "no" | "unknown" — 웹 언급에서 파생. 지도 API 는 주차 정보를 주지 않는다.
+  parking         String   @default("unknown")
+  /// 1인 예상 지출(원). 웹 언급 가격의 중앙값. 없으면 null.
+  priceHintKrw    Int?
+  fetchedAt       DateTime
+
+  areaLinks AreaFetchPlace[]
+  mentions  WebMention[]
+
+  @@unique([provider, providerPlaceId])
+  @@index([fetchedAt])
+}
+
+/// "이 좌표 주변 반경 r" 단위의 수집 기록. fetchedAt 이 TTL 안이면 다시 수집하지 않는다.
+model AreaFetch {
+  id         String   @id @default(uuid())
+  anchorKey  String   @unique
+  anchorName String
+  anchorLat  Float
+  anchorLng  Float
+  radiusM    Int
+  fetchedAt  DateTime
+
+  places   AreaFetchPlace[]
+  mentions WebMention[]
+
+  @@index([fetchedAt])
+}
+
+model AreaFetchPlace {
+  areaFetchId String
+  placeId     String
+  areaFetch   AreaFetch @relation(fields: [areaFetchId], references: [id], onDelete: Cascade)
+  place       Place     @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@id([areaFetchId, placeId])
+}
+
+/// 웹 글(모델 웹검색)에서 뽑아 지도 장소와 매칭된 언급. 매칭 안 된 언급은 저장하지 않는다.
+model WebMention {
+  id           String    @id @default(uuid())
+  areaFetchId  String
+  placeId      String
+  placeNameRaw String
+  hint         String?
+  priceHintKrw Int?
+  parking      String    @default("unknown")
+  sourceUrl    String
+  sourceTitle  String
+  publishedAt  DateTime?
+
+  areaFetch AreaFetch @relation(fields: [areaFetchId], references: [id], onDelete: Cascade)
+  place     Place     @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@unique([areaFetchId, placeId, sourceUrl])
+  @@index([placeId])
+}
