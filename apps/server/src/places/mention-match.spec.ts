@@ -5,6 +5,7 @@ const m = (placeName: string): ExtractedMention => ({
   hint: null,
   priceHintKrw: null,
   parking: "unknown",
+  sourceKind: "blog",
   sourceUrl: "https://example.com/post",
   sourceTitle: "글",
   publishedAt: null,

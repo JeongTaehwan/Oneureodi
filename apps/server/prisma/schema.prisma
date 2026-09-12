@@ -68,6 +68,8 @@ model WebMention {
   hint         String?
   priceHintKrw Int?
   parking      String    @default("unknown")
+  /// "blog" | "instagram" | "web" — 어떤 종류의 글에서 나온 언급인지
+  sourceKind   String    @default("web")
   sourceUrl    String
   sourceTitle  String
   publishedAt  DateTime?

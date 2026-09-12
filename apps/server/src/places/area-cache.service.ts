@@ -93,6 +93,7 @@ export class AreaCacheService {
         hint: m.hint,
         priceHintKrw: m.priceHintKrw,
         parking: m.parking,
+        sourceKind: m.sourceKind,
         sourceUrl: m.sourceUrl,
         sourceTitle: m.sourceTitle,
         publishedAt: m.publishedAt,

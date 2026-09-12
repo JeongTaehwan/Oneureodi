@@ -1,24 +1,27 @@
-import { buildResearchText, searchQueries } from "./web-hints";
+import { SOURCE_SPECS, buildResearchText } from "./web-hints";
 
 describe("buildResearchText", () => {
-  it("URL 기준으로 중복을 접고 번호를 붙인다", () => {
+  it("URL 기준으로 중복을 접고 번호와 출처 종류를 붙인다", () => {
     const { text, sources } = buildResearchText([
-      { title: "글A", url: "https://a", content: " 성수 카페 소개 ", publishedAt: null },
-      { title: "글A 복제", url: "https://a", content: "x", publishedAt: null },
-      { title: "", url: "https://b", content: "맛집", publishedAt: null },
-      { title: "주소 없음", url: "", content: "무시", publishedAt: null },
+      { kind: "blog", title: "글A", url: "https://a", content: " 성수 카페 소개 ", publishedAt: null },
+      { kind: "instagram", title: "글A 복제", url: "https://a", content: "x", publishedAt: null },
+      { kind: "instagram", title: "", url: "https://b", content: "맛집", publishedAt: null },
+      { kind: "web", title: "주소 없음", url: "", content: "무시", publishedAt: null },
     ]);
-    expect(sources).toEqual([
-      { url: "https://a", title: "글A", publishedAt: null },
-      { url: "https://b", title: "https://b", publishedAt: null },
+    expect(sources.map((s) => [s.url, s.kind])).toEqual([
+      ["https://a", "blog"],
+      ["https://b", "instagram"],
     ]);
-    expect(text).toBe("[1] 글A\n성수 카페 소개\n\n[2] \n맛집");
+    expect(text).toBe("[1] (블로그) 글A\n성수 카페 소개\n\n[2] (인스타그램) \n맛집");
   });
 });
 
-describe("searchQueries", () => {
-  it("지역당 질의 3개", () => {
-    expect(searchQueries("성수동")).toHaveLength(3);
-    expect(searchQueries("성수동")[0]).toContain("성수동");
+describe("SOURCE_SPECS", () => {
+  it("지역당 검색 5번, 인스타그램은 모음 페이지를 버린다", () => {
+    const total = SOURCE_SPECS.reduce((n, s) => n + s.queries("성수동").length, 0);
+    expect(total).toBe(5);
+    const insta = SOURCE_SPECS.find((s) => s.kind === "instagram");
+    expect(insta?.includeDomains).toEqual(["instagram.com"]);
+    expect(insta?.dropUrlContaining).toContain("/popular/");
   });
 });

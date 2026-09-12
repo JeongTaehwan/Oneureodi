@@ -1,3 +1,4 @@
+import { Logger } from "@nestjs/common";
 import { ApiError, GoogleGenAI, ThinkingLevel, type GenerateContentResponse } from "@google/genai";
 import { z } from "zod";
 import { UpstreamError } from "../common/http";
@@ -17,6 +18,7 @@ const RETRY = { attempts: 3, initialDelay: 1, maxDelay: 3, expBase: 2, jitter: 0
 /** Google AI Studio 키로 쓰는 Gemini. 무료 등급에 Google 검색 그라운딩이 포함된다. */
 export class GeminiClient extends LlmClient {
   readonly provider = "gemini";
+  private readonly log = new Logger(GeminiClient.name);
   private readonly ai: GoogleGenAI;
 
   constructor(private readonly opts: GeminiClientOptions) {
@@ -36,6 +38,7 @@ export class GeminiClient extends LlmClient {
 
   private async generateJsonWith<T>(model: string, input: JsonInput<T>): Promise<T> {
     let res: GenerateContentResponse;
+    const started = Date.now();
     try {
       res = await this.ai.models.generateContent({
         model,
@@ -46,12 +49,14 @@ export class GeminiClient extends LlmClient {
           responseJsonSchema: toGeminiJsonSchema(input.schema),
           // 기본값(동적 thinking)은 후보 60개 코스 구성에 15초 넘게 걸렸다. 추출·구성은 최소 thinking 으로.
           thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL },
-          abortSignal: AbortSignal.timeout(this.opts.timeoutMs),
+          abortSignal: AbortSignal.timeout(input.timeoutMs ?? this.opts.timeoutMs),
         },
       });
     } catch (err) {
+      this.log.warn(`${model} ${input.name} 실패 ${Date.now() - started}ms: ${err instanceof Error ? err.message.slice(0, 120) : String(err)}`);
       throw toUpstream(err);
     }
+    this.log.log(`${model} ${input.name} ${Date.now() - started}ms in=${res.usageMetadata?.promptTokenCount ?? "?"} out=${res.usageMetadata?.candidatesTokenCount ?? "?"} think=${res.usageMetadata?.thoughtsTokenCount ?? 0}`);
     const text = res.text;
     if (!text) throw new UpstreamError("gemini", null, `빈 응답 (${input.name})`);
     let raw: unknown;
@@ -123,8 +128,9 @@ export function insertMarkersByByteOffset(text: string, spans: readonly { end: n
   return buf.toString("utf8");
 }
 
+/** 과부하(503), 쿼터(429), 그리고 응답이 제한 시간 안에 안 온 경우. 셋 다 "다른 모델이면 될 수 있다"는 뜻이다. */
 function isOverloaded(err: UpstreamError): boolean {
-  return err.status === 503 || err.status === 429;
+  return err.status === 503 || err.status === 429 || err.message.includes("timeout");
 }
 
 function toUpstream(err: unknown): UpstreamError {

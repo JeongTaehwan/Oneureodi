@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import type { Parking } from "@oneureodi/shared";
+import type { Parking, SourceKind } from "@oneureodi/shared";
 import { PrismaService } from "../prisma/prisma.service";
 import type { Anchor, RawPlace } from "../collectors/types";
 
@@ -9,6 +9,7 @@ export interface StoredMention {
   hint: string | null;
   priceHintKrw: number | null;
   parking: Parking;
+  sourceKind: SourceKind;
   sourceUrl: string;
   sourceTitle: string;
   publishedAt: Date | null;
@@ -70,6 +71,7 @@ export class PlacesRepository {
         hint: m.hint,
         priceHintKrw: m.priceHintKrw,
         parking: m.parking as Parking,
+        sourceKind: m.sourceKind as SourceKind,
         sourceUrl: m.sourceUrl,
         sourceTitle: m.sourceTitle,
         publishedAt: m.publishedAt,

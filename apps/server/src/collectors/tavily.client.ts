@@ -15,7 +15,7 @@ interface TavilyResponse {
 
 const ENDPOINT = "https://api.tavily.com/search";
 /** 질의당 결과 수. basic 검색은 결과 수와 무관하게 1 크레딧. 무료 플랜 월 1,000 크레딧. */
-const MAX_RESULTS = 10;
+const MAX_RESULTS = 8;
 
 /** 카드 없이 월 1,000회 주는 검색 API. LLM 그라운딩이 무료 등급에서 막힐 때의 검색 소스. */
 @Injectable()
@@ -26,14 +26,20 @@ export class TavilyClient {
     return this.env.TAVILY_API_KEY.length > 0;
   }
 
-  async search(query: string): Promise<WebSearchResult[]> {
+  async search(query: string, opts: { includeDomains?: string[] } = {}): Promise<WebSearchResult[]> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.env.EXTERNAL_TIMEOUT_MS * 2);
     try {
       const res = await fetch(ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.env.TAVILY_API_KEY}` },
-        body: JSON.stringify({ query, search_depth: "basic", max_results: MAX_RESULTS, include_published_date: true }),
+        body: JSON.stringify({
+          query,
+          search_depth: "basic",
+          max_results: MAX_RESULTS,
+          include_published_date: true,
+          ...(opts.includeDomains?.length ? { include_domains: opts.includeDomains } : {}),
+        }),
         signal: controller.signal,
       });
       if (!res.ok) {

@@ -4,10 +4,11 @@ import { LlmModule } from "../llm/llm.module";
 import { PlacesModule } from "../places/places.module";
 import { RecommendController } from "./recommend.controller";
 import { RecommendService } from "./recommend.service";
+import { RoutesService } from "./routes.service";
 
 @Module({
   imports: [CollectorsModule, PlacesModule, LlmModule],
   controllers: [RecommendController],
-  providers: [RecommendService],
+  providers: [RecommendService, RoutesService],
 })
 export class RecommendModule {}

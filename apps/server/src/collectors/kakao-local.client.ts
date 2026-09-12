@@ -77,6 +77,24 @@ export class KakaoLocalClient {
     return pages.flat().map(toRawPlace);
   }
 
+  /** 장소 주변 가장 가까운 주차장(카테고리 PK6). 반경 안에 없으면 null. */
+  async nearestParking(center: { lat: number; lng: number }, radiusM: number): Promise<{ name: string; distanceM: number; address: string | null } | null> {
+    const res = await this.get("category.json", {
+      category_group_code: "PK6",
+      x: center.lng,
+      y: center.lat,
+      radius: Math.min(radiusM, 20000),
+      sort: "distance",
+      size: 1,
+    }).catch(() => null);
+    const doc = res?.documents[0];
+    if (!doc) return null;
+    const distance = Number((doc as { distance?: string }).distance);
+    // 거리를 못 받은 주차장은 "0m" 로 보이느니 없는 걸로 친다.
+    if (!Number.isFinite(distance) || distance <= 0) return null;
+    return { name: doc.place_name, distanceM: Math.round(distance), address: doc.road_address_name || doc.address_name || null };
+  }
+
   /** 블로그에 나온 상호를 좌표 주변에서 찾는다. 반경 밖이면 null. */
   async lookupByName(name: string, center: { lat: number; lng: number }, radiusM: number): Promise<RawPlace | null> {
     const res = await this.get("keyword.json", {

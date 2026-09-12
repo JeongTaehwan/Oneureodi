@@ -29,7 +29,7 @@ export class OpenAiClient extends LlmClient {
           ],
           text: { format: zodTextFormat(input.schema, input.name) },
         },
-        { timeout: this.opts.timeoutMs },
+        { timeout: input.timeoutMs ?? this.opts.timeoutMs },
       );
       const parsed = res.output_parsed;
       if (parsed === null || parsed === undefined) throw new UpstreamError("openai", null, `빈 응답 (${input.name})`);

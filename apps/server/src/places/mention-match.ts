@@ -1,4 +1,4 @@
-import type { Parking } from "@oneureodi/shared";
+import type { Parking, SourceKind } from "@oneureodi/shared";
 import { namesMatch } from "../common/text";
 
 /** 웹 글에서 뽑은 장소 언급 하나 */
@@ -7,6 +7,7 @@ export interface ExtractedMention {
   hint: string | null;
   priceHintKrw: number | null;
   parking: Parking;
+  sourceKind: SourceKind;
   sourceUrl: string;
   sourceTitle: string;
   publishedAt: Date | null;

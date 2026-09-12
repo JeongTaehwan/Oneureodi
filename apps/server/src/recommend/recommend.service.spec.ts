@@ -1,6 +1,6 @@
 import type { RecommendRequest } from "@oneureodi/shared";
 import type { Candidate } from "./candidate";
-import { materialize } from "./recommend.service";
+import { MIN_CANDIDATES_AFTER_EXCLUDE, applySchedule, excludeSeen, materialize } from "./recommend.service";
 
 const req: RecommendRequest = {
   location: "성수",
@@ -8,6 +8,7 @@ const req: RecommendRequest = {
   budgetKrw: 60000,
   hasCar: false,
   meetAt: { weekday: 6, time: "14:00" },
+  excludePlaceIds: [],
 };
 
 const cand = (id: string, price: number | null, lat = 37.54, lng = 127.05): Candidate => ({
@@ -22,6 +23,7 @@ const cand = (id: string, price: number | null, lat = 37.54, lng = 127.05): Cand
   priceHintKrw: price,
   hints: [],
   mentionCount: 0,
+  mentionCounts: { blog: 0, instagram: 0, web: 0 },
 });
 
 describe("materialize", () => {
@@ -50,5 +52,45 @@ describe("materialize", () => {
     expect(
       materialize([{ title: "t", reason: "r", stopPlaceIds: ["a", "b"] }], far, { ...req, hasCar: true })[0]?.transport,
     ).toBe("car");
+  });
+});
+
+describe("excludeSeen", () => {
+  const many = Array.from({ length: MIN_CANDIDATES_AFTER_EXCLUDE + 5 }, (_, i) => ({ id: `p${i}` }));
+
+  it("이미 본 장소를 빼고도 후보가 충분하면 뺀다", () => {
+    const out = excludeSeen(many, ["p0", "p1"]);
+    expect(out).toHaveLength(many.length - 2);
+    expect(out.some((c) => c.id === "p0")).toBe(false);
+  });
+
+  it("빼면 너무 적어지면 빼지 않는다", () => {
+    const few = many.slice(0, MIN_CANDIDATES_AFTER_EXCLUDE + 1);
+    expect(excludeSeen(few, ["p0", "p1"])).toHaveLength(few.length);
+  });
+
+  it("제외 목록이 비면 그대로", () => {
+    expect(excludeSeen(many, [])).toHaveLength(many.length);
+  });
+});
+
+describe("applySchedule", () => {
+  const at13 = { ...req, meetAt: { weekday: 6, time: "13:00" } };
+  const bar = { ...cand("bar", 20000), category: "음식점 > 술집 > 와인바" };
+  const cafe = { ...cand("cafe", 6000), category: "음식점 > 카페" };
+  const gallery = { ...cand("gal", null), category: "문화,예술 > 문화시설 > 미술관" };
+
+  it("13시 약속에 와인바가 첫 장소면 떨어진다", () => {
+    const [c] = applySchedule(materialize([{ title: "t", reason: "r", stopPlaceIds: ["bar", "cafe"] }], [bar, cafe], at13), at13, () => 15);
+    expect(c?.scheduleOk).toBe(false);
+    expect(c?.stops[0]?.arrivalTime).toBe("13:00");
+  });
+
+  it("카페 → 전시 → 와인바 순서에 이동 60분씩이면 와인바 17:00 이후 도착으로 통과", () => {
+    const [c] = applySchedule(materialize([{ title: "t", reason: "r", stopPlaceIds: ["cafe", "gal", "bar"] }], [bar, cafe, gallery], at13), at13, () => 60);
+    expect(c?.stops.map((s) => s.arrivalTime)).toEqual(["13:00", "15:00", "17:20"]);
+    expect(c?.scheduleOk).toBe(true);
+    expect(c?.endTime).toBe("18:50");
+    expect(c?.stops[2]?.openLabel).toBe("17:00~02:00");
   });
 });

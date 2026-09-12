@@ -8,6 +8,8 @@ export interface JsonInput<T> {
   schema: ZodType<T>;
   /** 스키마 이름. 제공자에 따라 요청에 실리기도 하고 로그에만 쓰이기도 한다. */
   name: string;
+  /** 이 호출만 다른 제한 시간을 쓸 때 (긴 추출 등) */
+  timeoutMs?: number;
 }
 
 export interface GroundedInput {

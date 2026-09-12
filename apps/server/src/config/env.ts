@@ -11,8 +11,8 @@ const EnvSchema = z
     /** gemini: 카드 없이 무료 등급. openai: 크레딧 충전 필요. */
     LLM_PROVIDER: z.enum(["gemini", "openai"]).default("gemini"),
     GEMINI_API_KEY: z.string().default(""),
-    GEMINI_SEARCH_MODEL: z.string().default("gemini-3.6-flash"),
-    GEMINI_COMPOSE_MODEL: z.string().default("gemini-3.6-flash"),
+    GEMINI_SEARCH_MODEL: z.string().default("gemini-3.5-flash"),
+    GEMINI_COMPOSE_MODEL: z.string().default("gemini-3.5-flash"),
     /** 주 모델이 503/429 를 내면 이걸로 한 번 더. 빈 값이면 대체 없음 */
     GEMINI_FALLBACK_MODEL: z.string().default("gemini-3.1-flash-lite"),
     OPENAI_API_KEY: z.string().default(""),
@@ -27,6 +27,8 @@ const EnvSchema = z
     LLM_TOOL_TIMEOUT_MS: z.coerce.number().int().positive().default(40000),
     MAX_LLM_CANDIDATES: z.coerce.number().int().positive().default(60),
     MAX_MENTION_LOOKUPS: z.coerce.number().int().min(0).default(20),
+    /** 차 있을 때 장소 주변 주차장을 찾는 반경(m) */
+    PARKING_RADIUS_M: z.coerce.number().int().positive().default(300),
   })
   .superRefine((env, ctx) => {
     const required = env.LLM_PROVIDER === "openai" ? ["OPENAI_API_KEY", "OPENAI_SEARCH_MODEL", "OPENAI_COMPOSE_MODEL"] : ["GEMINI_API_KEY"];

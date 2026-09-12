@@ -19,3 +19,7 @@ apps/mobile/ios/
 *.p12
 *.key
 *.mobileprovision
+
+# design canvas 산출물 (design/*.dc.html 에서 재생성)
+design/*.html
+!design/*.dc.html
