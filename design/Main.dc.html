@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap">
+  <style>
+    body { margin: 0; font-family: 'Gowun Dodum', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; }
+    a { color: #F28B6F; } a:hover { color: #D9694C; }
+  </style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FFFBF5; color: #4A403B; padding: 56px 20px 24px; display: flex; flex-direction: column; gap: 12px; position: relative; overflow: hidden;">
+  <div style="position: absolute; top: 30px; right: -30px; width: 120px; height: 120px; border-radius: 50%; background: #FFE4D6;"></div>
+  <div style="position: absolute; top: 90px; right: 40px; width: 40px; height: 40px; border-radius: 50%; background: #F28B6F; opacity: 0.6;"></div>
+
+  <div style="display: flex; flex-direction: column; gap: 4px; position: relative;">
+    <div style="font-size: 30px; line-height: 36px; color: #4A403B;">오늘 어디?</div>
+    <div style="font-size: 14px; line-height: 20px; color: #8E8078;">조건만 알려주면 코스 5개를 골라드려요</div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; background: #FFFFFF; border-radius: 24px; box-shadow: 0 6px 18px rgba(74, 64, 59, 0.06); position: relative;">
+    <div style="font-size: 13px; color: #8E8078;">만날 곳</div>
+    <div style="display: flex; align-items: center; height: 46px; padding: 0 14px; background: #FFF6EF; border-radius: 14px; font-size: 16px; color: #BDB0A8;">성수동, 홍대입구역 같은 곳</div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; background: #FFFFFF; border-radius: 24px; box-shadow: 0 6px 18px rgba(74, 64, 59, 0.06);">
+    <div style="font-size: 13px; color: #8E8078;">우리 성향</div>
+    <div style="display: flex; gap: 8px;">
+      <div style="display: flex; align-items: center; justify-content: center; height: 44px; flex: 1; border-radius: 999px; background: #F28B6F; color: #FFFFFF; font-size: 15px;">외향적</div>
+      <div style="display: flex; align-items: center; justify-content: center; height: 44px; flex: 1; border-radius: 999px; background: #FFF6EF; color: #8E8078; font-size: 15px;">내향적</div>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <div style="display: flex; align-items: center; justify-content: center; height: 44px; flex: 1; border-radius: 999px; background: #F28B6F; color: #FFFFFF; font-size: 15px;">액티비티 좋아함</div>
+      <div style="display: flex; align-items: center; justify-content: center; height: 44px; flex: 1; border-radius: 999px; background: #FFF6EF; color: #8E8078; font-size: 15px;">안 좋아함</div>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 10px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; flex: 1; padding: 16px; background: #FFFFFF; border-radius: 24px; box-shadow: 0 6px 18px rgba(74, 64, 59, 0.06);">
+      <div style="font-size: 13px; color: #8E8078;">둘이 쓸 돈</div>
+      <div style="display: flex; align-items: center; justify-content: space-between; height: 46px; padding: 0 14px; background: #FFF6EF; border-radius: 14px; font-size: 16px;"><span>100,000</span><span style="color: #BDB0A8;">원</span></div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px; width: 128px; padding: 16px; background: #FFFFFF; border-radius: 24px; box-shadow: 0 6px 18px rgba(74, 64, 59, 0.06);">
+      <div style="font-size: 13px; color: #8E8078;">차</div>
+      <div style="display: flex; align-items: center; justify-content: space-between; height: 46px;">
+        <span style="font-size: 16px;">없음</span>
+        <div style="width: 46px; height: 28px; border-radius: 999px; background: #EFE4DC; position: relative;"><div style="position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.15);"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; background: #FFFFFF; border-radius: 24px; box-shadow: 0 6px 18px rgba(74, 64, 59, 0.06);">
+    <div style="font-size: 13px; color: #8E8078;">만나는 요일과 시간</div>
+    <div style="display: flex; gap: 6px;">
+      <div style="display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 999px; background: #FFF6EF; font-size: 14px; color: #8E8078;">월</div>
+      <div style="display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 999px; background: #FFF6EF; font-size: 14px; color: #8E8078;">화</div>
+      <div style="display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 999px; background: #FFF6EF; font-size: 14px; color: #8E8078;">수</div>
+      <div style="display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 999px; background: #FFF6EF; font-size: 14px; color: #8E8078;">목</div>
+      <div style="display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 999px; background: #FFF6EF; font-size: 14px; color: #8E8078;">금</div>
+      <div style="display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 999px; background: #F28B6F; color: #FFFFFF; font-size: 14px;">토</div>
+      <div style="display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 999px; background: #FFF6EF; font-size: 14px; color: #F28B6F;">일</div>
+    </div>
+    <div style="display: flex; align-items: center; height: 46px; padding: 0 14px; background: #FFF6EF; border-radius: 14px; font-size: 16px;">14:00</div>
+  </div>
+
+  <div style="flex-grow: 1;"></div>
+
+  <div style="display: flex; align-items: center; justify-content: center; height: 56px; border-radius: 999px; background: #F28B6F; color: #FFFFFF; font-size: 17px; box-shadow: 0 8px 20px rgba(242, 139, 111, 0.35);">코스 추천받기</div>
+</div>
+</x-dc>
+</body>
+</html>
